@@ -1,0 +1,123 @@
+# This test doesn't check contents of command-started events.
+data: []
+tests:
+  - description: primary
+
+    operations:
+      - name: startTransaction
+        arguments:
+          session: session0
+      - name: insertOne
+        arguments:
+          document:
+            _id: 1
+          session: session0
+        result:
+          insertedId: 1
+      - name: count
+        arguments:
+          filter:
+            _id: 1
+          readPreference:
+            mode: primary
+          session: session0
+        result: 1
+      - name: commitTransaction
+        arguments:
+          session: session0
+
+    outcome:
+      collection:
+        data:
+          - _id: 1
+
+  # "Violate rule 1" example from spec.
+  - description: write and read
+
+    operations:
+      - name: startTransaction
+        arguments:
+          session: session0
+      - name: insertOne
+        arguments:
+          document:
+            _id: 1
+          session: session0
+        result:
+          insertedId: 1
+      - name: count
+        arguments:
+          readPreference:
+            mode: secondary
+          session: session0
+        result:
+          # Client-side error.
+          errorContains: transaction readPreference changed
+      - name: commitTransaction
+        arguments:
+          session: session0
+
+    outcome:
+      collection:
+        data:
+          - _id: 1
+
+  # "Violate rule 2" example from spec.
+  - description: conflict
+
+    operations:
+      - name: startTransaction
+        arguments:
+          session: session0
+      - name: count
+        arguments:
+          readPreference:
+            mode: primaryPreferred
+          session: session0
+        result: 0
+      - name: count
+        arguments:
+          readPreference:
+            mode: primary
+          session: session0
+        result:
+          # Client-side error.
+          errorContains: transaction readPreference changed
+      - name: commitTransaction
+        arguments:
+          session: session0
+
+    outcome:
+      collection:
+        data: []
+
+  # "Violate rule 3" example from spec.
+  - description: read and write
+
+    skipReason: Server changes needed for commitTransaction on secondary.
+
+    operations:
+      - name: startTransaction
+        arguments:
+          session: session0
+      - name: count
+        arguments:
+          readPreference:
+            mode: secondary
+          session: session0
+        result: 0
+      - name: insertOne
+        arguments:
+          document:
+            _id: 1
+          session: session0
+        result:
+          # Client-side error.
+          errorContains: transaction readPreference changed
+      - name: commitTransaction
+        arguments:
+          session: session0
+
+    outcome:
+      collection:
+        data: []
