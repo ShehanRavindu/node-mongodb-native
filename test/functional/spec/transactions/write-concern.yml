@@ -28,10 +28,13 @@ tests:
             documents:
               - _id: 1
             ordered: true
+            readConcern:
+              level: "snapshot"
             lsid: session0
             txnNumber:
               $numberLong: "1"
             stmtId: 0
+            startTransaction: true
             autocommit: false
             writeConcern:
           command_name: insert
@@ -43,6 +46,8 @@ tests:
             txnNumber:
               $numberLong: "1"
             stmtId: 1
+            startTransaction:
+            autocommit: false
             writeConcern:
               w: majority
           command_name: commitTransaction
@@ -77,10 +82,13 @@ tests:
             documents:
               - _id: 1
             ordered: true
+            readConcern:
+              level: "snapshot"
             lsid: session0
             txnNumber:
               $numberLong: "1"
             stmtId: 0
+            startTransaction: true
             autocommit: false
             writeConcern:
           command_name: insert
@@ -92,6 +100,8 @@ tests:
             txnNumber:
               $numberLong: "1"
             stmtId: 1
+            startTransaction:
+            autocommit: false
             writeConcern:
           command_name: commitTransaction
           database_name: admin
@@ -128,10 +138,13 @@ tests:
             documents:
               - _id: 1
             ordered: true
+            readConcern:
+              level: "snapshot"
             lsid: session0
             txnNumber:
               $numberLong: "1"
             stmtId: 0
+            startTransaction: true
             autocommit: false
             writeConcern:
           command_name: insert
@@ -143,6 +156,8 @@ tests:
             txnNumber:
               $numberLong: "1"
             stmtId: 1
+            startTransaction:
+            autocommit: false
             writeConcern:
               w: majority
           command_name: abortTransaction
@@ -176,10 +191,13 @@ tests:
             documents:
               - _id: 1
             ordered: true
+            readConcern:
+              level: "snapshot"
             lsid: session0
             txnNumber:
               $numberLong: "1"
             stmtId: 0
+            startTransaction: true
             autocommit: false
             writeConcern:
           command_name: insert
@@ -191,6 +209,8 @@ tests:
             txnNumber:
               $numberLong: "1"
             stmtId: 1
+            startTransaction:
+            autocommit: false
             writeConcern:
           command_name: abortTransaction
           database_name: admin

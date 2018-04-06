@@ -19,11 +19,6 @@ common:
 tests:
   - description: count
 
-    # Invariant failure
-    # !_planYielding->getOpCtx()->lockState()->inAWriteUnitOfWork()
-    # src/mongo/db/query/plan_yield_policy.cpp 77
-    skipReason: "TODO: Crashes server"
-
     operations:
       - *startTransaction
       - &count
@@ -40,12 +35,15 @@ tests:
       - command_started_event:
           command:
             count: test
-            filter:
-              - _id: 1
+            query:
+              _id: 1
+            readConcern:
+              level: "snapshot"
             lsid: session0
             txnNumber:
               $numberLong: "1"
             stmtId: 0
+            startTransaction: true
             autocommit: false
             writeConcern:
           command_name: count
@@ -53,13 +51,14 @@ tests:
       - command_started_event:
           command:
             count: test
-            filter:
-              - _id: 1
+            query:
+              _id: 1
             lsid: session0
             txnNumber:
               $numberLong: "1"
             stmtId: 1
-            autocommit:
+            startTransaction:
+            autocommit: false
             writeConcern:
           command_name: count
           database_name: transaction-tests
@@ -70,6 +69,8 @@ tests:
             txnNumber:
               $numberLong: "1"
             stmtId: 2
+            startTransaction:
+            autocommit: false
             writeConcern:
           command_name: commitTransaction
           database_name: admin
@@ -80,8 +81,6 @@ tests:
           *data
 
   - description: find
-
-    skipReason: Await transactions support for find
 
     operations:
       - *startTransaction
@@ -98,10 +97,14 @@ tests:
       - command_started_event:
           command:
             find: test
+            batchSize: 3
+            readConcern:
+              level: "snapshot"
             lsid: session0
             txnNumber:
               $numberLong: "1"
             stmtId: 0
+            startTransaction: true
             autocommit: false
           command_name: find
           database_name: transaction-tests
@@ -110,32 +113,40 @@ tests:
             getMore:
               # 42 is a fake placeholder value for the cursorId.
               $numberLong: '42'
+            collection: test
+            batchSize: 3
             lsid: session0
             txnNumber:
               $numberLong: "1"
             stmtId: 1
-            autocommit:
+            startTransaction:
+            autocommit: false
           command_name: getMore
           database_name: transaction-tests
       - command_started_event:
           command:
             find: test
+            batchSize: 3
             lsid: session0
             txnNumber:
               $numberLong: "1"
             stmtId: 2
-            autocommit:
+            startTransaction:
+            autocommit: false
           command_name: find
           database_name: transaction-tests
       - command_started_event:
           command:
             getMore:
               $numberLong: '42'
+            collection: test
+            batchSize: 3
             lsid: session0
             txnNumber:
               $numberLong: "1"
             stmtId: 3
-            autocommit:
+            startTransaction:
+            autocommit: false
           command_name: getMore
           database_name: transaction-tests
       - command_started_event:
@@ -145,6 +156,8 @@ tests:
             txnNumber:
               $numberLong: "1"
             stmtId: 4
+            startTransaction:
+            autocommit: false
             writeConcern:
           command_name: commitTransaction
           database_name: admin
@@ -153,37 +166,28 @@ tests:
 
   - description: distinct
 
-    skipReason: Distinct with readConcern level snapshot, SERVER-33354
-
     operations:
       - *startTransaction
       - name: distinct
         arguments:
           fieldName: _id
           session: session0
-        result: [1]
+        result: [1, 2, 3, 4]
       - *commitTransaction
 
     expectations:
       - command_started_event:
           command:
             distinct: test
+            key: _id
             lsid: session0
+            readConcern:
+              level: "snapshot"
             txnNumber:
               $numberLong: "1"
             stmtId: 0
+            startTransaction: true
             autocommit: false
-            writeConcern:
-          command_name: distinct
-          database_name: transaction-tests
-      - command_started_event:
-          command:
-            distinct: test
-            lsid: session0
-            txnNumber:
-              $numberLong: "1"
-            stmtId: 1
-            autocommit:
             writeConcern:
           command_name: distinct
           database_name: transaction-tests
@@ -191,9 +195,12 @@ tests:
           command:
             commitTransaction: 1
             lsid: session0
+            readConcern:
             txnNumber:
               $numberLong: "1"
-            stmtId: 2
+            stmtId: 1
+            startTransaction:
+            autocommit: false
             writeConcern:
           command_name: commitTransaction
           database_name: admin

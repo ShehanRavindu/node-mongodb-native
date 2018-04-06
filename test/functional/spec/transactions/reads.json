@@ -30,7 +30,6 @@
   "tests": [
     {
       "description": "count",
-      "skipReason": "TODO: Crashes server",
       "operations": [
         {
           "name": "startTransaction",
@@ -70,16 +69,18 @@
           "command_started_event": {
             "command": {
               "count": "test",
-              "filter": [
-                {
-                  "_id": 1
-                }
-              ],
+              "query": {
+                "_id": 1
+              },
+              "readConcern": {
+                "level": "snapshot"
+              },
               "lsid": "session0",
               "txnNumber": {
                 "$numberLong": "1"
               },
               "stmtId": 0,
+              "startTransaction": true,
               "autocommit": false,
               "writeConcern": null
             },
@@ -91,17 +92,16 @@
           "command_started_event": {
             "command": {
               "count": "test",
-              "filter": [
-                {
-                  "_id": 1
-                }
-              ],
+              "query": {
+                "_id": 1
+              },
               "lsid": "session0",
               "txnNumber": {
                 "$numberLong": "1"
               },
               "stmtId": 1,
-              "autocommit": null,
+              "startTransaction": null,
+              "autocommit": false,
               "writeConcern": null
             },
             "command_name": "count",
@@ -117,6 +117,8 @@
                 "$numberLong": "1"
               },
               "stmtId": 2,
+              "startTransaction": null,
+              "autocommit": false,
               "writeConcern": null
             },
             "command_name": "commitTransaction",
@@ -145,7 +147,6 @@
     },
     {
       "description": "find",
-      "skipReason": "Await transactions support for find",
       "operations": [
         {
           "name": "startTransaction",
@@ -207,11 +208,16 @@
           "command_started_event": {
             "command": {
               "find": "test",
+              "batchSize": 3,
+              "readConcern": {
+                "level": "snapshot"
+              },
               "lsid": "session0",
               "txnNumber": {
                 "$numberLong": "1"
               },
               "stmtId": 0,
+              "startTransaction": true,
               "autocommit": false
             },
             "command_name": "find",
@@ -224,12 +230,15 @@
               "getMore": {
                 "$numberLong": "42"
               },
+              "collection": "test",
+              "batchSize": 3,
               "lsid": "session0",
               "txnNumber": {
                 "$numberLong": "1"
               },
               "stmtId": 1,
-              "autocommit": null
+              "startTransaction": null,
+              "autocommit": false
             },
             "command_name": "getMore",
             "database_name": "transaction-tests"
@@ -239,12 +248,14 @@
           "command_started_event": {
             "command": {
               "find": "test",
+              "batchSize": 3,
               "lsid": "session0",
               "txnNumber": {
                 "$numberLong": "1"
               },
               "stmtId": 2,
-              "autocommit": null
+              "startTransaction": null,
+              "autocommit": false
             },
             "command_name": "find",
             "database_name": "transaction-tests"
@@ -256,12 +267,15 @@
               "getMore": {
                 "$numberLong": "42"
               },
+              "collection": "test",
+              "batchSize": 3,
               "lsid": "session0",
               "txnNumber": {
                 "$numberLong": "1"
               },
               "stmtId": 3,
-              "autocommit": null
+              "startTransaction": null,
+              "autocommit": false
             },
             "command_name": "getMore",
             "database_name": "transaction-tests"
@@ -276,6 +290,8 @@
                 "$numberLong": "1"
               },
               "stmtId": 4,
+              "startTransaction": null,
+              "autocommit": false,
               "writeConcern": null
             },
             "command_name": "commitTransaction",
@@ -304,7 +320,6 @@
     },
     {
       "description": "distinct",
-      "skipReason": "Distinct with readConcern level snapshot, SERVER-33354",
       "operations": [
         {
           "name": "startTransaction",
@@ -319,7 +334,10 @@
             "session": "session0"
           },
           "result": [
-            1
+            1,
+            2,
+            3,
+            4
           ]
         },
         {
@@ -334,28 +352,17 @@
           "command_started_event": {
             "command": {
               "distinct": "test",
+              "key": "_id",
               "lsid": "session0",
+              "readConcern": {
+                "level": "snapshot"
+              },
               "txnNumber": {
                 "$numberLong": "1"
               },
               "stmtId": 0,
+              "startTransaction": true,
               "autocommit": false,
-              "writeConcern": null
-            },
-            "command_name": "distinct",
-            "database_name": "transaction-tests"
-          }
-        },
-        {
-          "command_started_event": {
-            "command": {
-              "distinct": "test",
-              "lsid": "session0",
-              "txnNumber": {
-                "$numberLong": "1"
-              },
-              "stmtId": 1,
-              "autocommit": null,
               "writeConcern": null
             },
             "command_name": "distinct",
@@ -367,10 +374,13 @@
             "command": {
               "commitTransaction": 1,
               "lsid": "session0",
+              "readConcern": null,
               "txnNumber": {
                 "$numberLong": "1"
               },
-              "stmtId": 2,
+              "stmtId": 1,
+              "startTransaction": null,
+              "autocommit": false,
               "writeConcern": null
             },
             "command_name": "commitTransaction",

@@ -2,37 +2,24 @@ data:
   - _id: 1
   - _id: 2
   - _id: 3
-  - _id: 4
-  - _id: 5
 
 tests:
-  - description: delete
+  - description: findOneAndDelete
 
     operations:
       - name: startTransaction
         arguments:
           session: session0
-      - name: deleteOne
+      - name: findOneAndDelete
         arguments:
-          filter:
-            _id: 1
+          filter: {_id: 3}
+          session: session0
+        result: {_id: 3}
+      - name: findOneAndDelete
+        arguments:
+          filter: {_id: 4}
           session: session0
         result:
-          deletedCount: 1
-      - name: deleteMany
-        arguments:
-          filter:
-            _id: {$lte: 3}
-          session: session0
-        result:
-          deletedCount: 2
-      - name: deleteOne
-        arguments:
-          filter:
-            _id: 4
-          session: session0
-        result:
-          deletedCount: 1
       - name: commitTransaction
         arguments:
           session: session0
@@ -40,53 +27,34 @@ tests:
     expectations:
       - command_started_event:
           command:
-            delete: test
-            deletes:
-              - q: {_id: 1}
-                limit: 1
-            ordered: true
-            readConcern:
-              level: "snapshot"
+            findAndModify: test
+            query: {_id: 3}
+            remove: True
             lsid: session0
             txnNumber:
               $numberLong: "1"
             stmtId: 0
             startTransaction: true
             autocommit: false
+            readConcern:
+              level: "snapshot"
             writeConcern:
-          command_name: delete
+          command_name: findAndModify
           database_name: transaction-tests
       - command_started_event:
           command:
-            delete: test
-            deletes:
-              - q: {_id: {$lte: 3}}
-                limit: 0
-            ordered: true
+            findAndModify: test
+            query: {_id: 4}
+            remove: True
             lsid: session0
             txnNumber:
               $numberLong: "1"
             stmtId: 1
             startTransaction:
             autocommit: false
+            readConcern:
             writeConcern:
-          command_name: delete
-          database_name: transaction-tests
-      - command_started_event:
-          command:
-            delete: test
-            deletes:
-              - q: {_id: 4}
-                limit: 1
-            ordered: true
-            lsid: session0
-            txnNumber:
-              $numberLong: "1"
-            stmtId: 2
-            startTransaction:
-            autocommit: false
-            writeConcern:
-          command_name: delete
+          command_name: findAndModify
           database_name: transaction-tests
       - command_started_event:
           command:
@@ -94,9 +62,10 @@ tests:
             lsid: session0
             txnNumber:
               $numberLong: "1"
-            stmtId: 3
+            stmtId: 2
             startTransaction:
             autocommit: false
+            readConcern:
             writeConcern:
           command_name: commitTransaction
           database_name: admin
@@ -104,4 +73,5 @@ tests:
     outcome:
       collection:
         data:
-          - _id: 5
+          - {_id: 1}
+          - {_id: 2}

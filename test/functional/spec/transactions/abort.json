@@ -64,11 +64,15 @@
                 }
               ],
               "ordered": true,
+              "readConcern": {
+                "level": "snapshot"
+              },
               "lsid": "session0",
               "txnNumber": {
                 "$numberLong": "1"
               },
               "stmtId": 0,
+              "startTransaction": true,
               "autocommit": false,
               "writeConcern": null
             },
@@ -85,6 +89,8 @@
                 "$numberLong": "1"
               },
               "stmtId": 1,
+              "startTransaction": null,
+              "autocommit": false,
               "writeConcern": null
             },
             "command_name": "abortTransaction",
@@ -101,11 +107,16 @@
                 }
               ],
               "ordered": true,
+              "readConcern": {
+                "level": "snapshot",
+                "afterClusterTime": 42
+              },
               "lsid": "session0",
               "txnNumber": {
                 "$numberLong": "2"
               },
               "stmtId": 0,
+              "startTransaction": true,
               "autocommit": false,
               "writeConcern": null
             },
@@ -122,6 +133,8 @@
                 "$numberLong": "2"
               },
               "stmtId": 1,
+              "startTransaction": null,
+              "autocommit": false,
               "writeConcern": null
             },
             "command_name": "abortTransaction",
@@ -168,11 +181,15 @@
                 }
               ],
               "ordered": true,
+              "readConcern": {
+                "level": "snapshot"
+              },
               "lsid": "session0",
               "txnNumber": {
                 "$numberLong": "1"
               },
               "stmtId": 0,
+              "startTransaction": true,
               "autocommit": false,
               "writeConcern": null
             },
@@ -189,6 +206,8 @@
                 "$numberLong": "1"
               },
               "stmtId": 1,
+              "startTransaction": null,
+              "autocommit": false,
               "writeConcern": null
             },
             "command_name": "abortTransaction",
@@ -250,11 +269,15 @@
                 }
               ],
               "ordered": true,
+              "readConcern": {
+                "level": "snapshot"
+              },
               "lsid": "session0",
               "txnNumber": {
                 "$numberLong": "1"
               },
               "stmtId": 0,
+              "startTransaction": true,
               "autocommit": false,
               "writeConcern": null
             },
@@ -271,6 +294,8 @@
                 "$numberLong": "1"
               },
               "stmtId": 1,
+              "startTransaction": null,
+              "autocommit": false,
               "writeConcern": null
             },
             "command_name": "abortTransaction",
@@ -352,11 +377,15 @@
                 }
               ],
               "ordered": true,
+              "readConcern": {
+                "level": "snapshot"
+              },
               "lsid": "session0",
               "txnNumber": {
                 "$numberLong": "1"
               },
               "stmtId": 0,
+              "startTransaction": true,
               "autocommit": false,
               "writeConcern": null
             },
@@ -373,6 +402,154 @@
                 "$numberLong": "1"
               },
               "stmtId": 1,
+              "startTransaction": null,
+              "autocommit": false,
+              "writeConcern": null
+            },
+            "command_name": "abortTransaction",
+            "database_name": "admin"
+          }
+        }
+      ]
+    },
+    {
+      "description": "abort ignores TransactionAborted",
+      "operations": [
+        {
+          "name": "startTransaction",
+          "arguments": {
+            "session": "session0"
+          }
+        },
+        {
+          "name": "insertOne",
+          "arguments": {
+            "document": {
+              "_id": 1
+            },
+            "session": "session0"
+          },
+          "result": {
+            "insertedId": 1
+          }
+        },
+        {
+          "name": "insertOne",
+          "arguments": {
+            "document": {
+              "_id": 1
+            },
+            "session": "session0"
+          },
+          "result": {
+            "errorCodeName": "DuplicateKey"
+          }
+        },
+        {
+          "name": "insertOne",
+          "arguments": {
+            "document": {
+              "_id": 1
+            },
+            "session": "session0"
+          },
+          "result": {
+            "errorCodeName": "NoSuchTransaction"
+          }
+        },
+        {
+          "name": "abortTransaction",
+          "arguments": {
+            "session": "session0"
+          }
+        }
+      ],
+      "expectations": [
+        {
+          "command_started_event": {
+            "command": {
+              "insert": "test",
+              "documents": [
+                {
+                  "_id": 1
+                }
+              ],
+              "ordered": true,
+              "readConcern": {
+                "level": "snapshot"
+              },
+              "lsid": "session0",
+              "txnNumber": {
+                "$numberLong": "1"
+              },
+              "stmtId": 0,
+              "startTransaction": true,
+              "autocommit": false,
+              "writeConcern": null
+            },
+            "command_name": "insert",
+            "database_name": "transaction-tests"
+          }
+        },
+        {
+          "command_started_event": {
+            "command": {
+              "insert": "test",
+              "documents": [
+                {
+                  "_id": 1
+                }
+              ],
+              "ordered": true,
+              "readConcern": null,
+              "lsid": "session0",
+              "txnNumber": {
+                "$numberLong": "1"
+              },
+              "stmtId": 1,
+              "startTransaction": null,
+              "autocommit": false,
+              "writeConcern": null
+            },
+            "command_name": "insert",
+            "database_name": "transaction-tests"
+          }
+        },
+        {
+          "command_started_event": {
+            "command": {
+              "insert": "test",
+              "documents": [
+                {
+                  "_id": 1
+                }
+              ],
+              "ordered": true,
+              "readConcern": null,
+              "lsid": "session0",
+              "txnNumber": {
+                "$numberLong": "1"
+              },
+              "stmtId": 2,
+              "startTransaction": null,
+              "autocommit": false,
+              "writeConcern": null
+            },
+            "command_name": "insert",
+            "database_name": "transaction-tests"
+          }
+        },
+        {
+          "command_started_event": {
+            "command": {
+              "abortTransaction": 1,
+              "lsid": "session0",
+              "txnNumber": {
+                "$numberLong": "1"
+              },
+              "stmtId": 3,
+              "startTransaction": null,
+              "autocommit": false,
               "writeConcern": null
             },
             "command_name": "abortTransaction",

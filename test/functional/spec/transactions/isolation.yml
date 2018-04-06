@@ -5,8 +5,6 @@ data: []
 tests:
   - description: one transaction
 
-    skipReason : "Skip until find supports stmtId, SERVER-33213"
-
     operations:
       - name: startTransaction
         arguments:
@@ -59,10 +57,6 @@ tests:
           - _id: 1
 
   - description: two transactions
-
-    # TODO: Crashes server.
-    # Invariant failure !_planYielding->getOpCtx()->lockState()->inAWriteUnitOfWork() src/mongo/db/query/plan_yield_policy.cpp 77
-    skipReason: "TODO: Crashes server."
 
     operations:
       - name: startTransaction

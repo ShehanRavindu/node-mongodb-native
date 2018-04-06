@@ -2,7 +2,10 @@
   "data": [],
   "tests": [
     {
-      "description": "insert",
+      "description": "increment txnNumber",
+      "clientOptions": {
+        "retryWrites": true
+      },
       "operations": [
         {
           "name": "startTransaction",
@@ -23,41 +26,21 @@
           }
         },
         {
-          "name": "insertMany",
+          "name": "commitTransaction",
           "arguments": {
-            "documents": [
-              {
-                "_id": 2
-              },
-              {
-                "_id": 3
-              }
-            ],
             "session": "session0"
-          },
-          "result": {
-            "insertedIds": {
-              "0": 2,
-              "1": 3
-            }
           }
         },
         {
           "name": "insertOne",
           "arguments": {
             "document": {
-              "_id": 4
+              "_id": 2
             },
             "session": "session0"
           },
           "result": {
-            "insertedId": 4
-          }
-        },
-        {
-          "name": "commitTransaction",
-          "arguments": {
-            "session": "session0"
+            "insertedId": 2
           }
         },
         {
@@ -70,18 +53,38 @@
           "name": "insertOne",
           "arguments": {
             "document": {
-              "_id": 5
+              "_id": 3
             },
             "session": "session0"
           },
           "result": {
-            "insertedId": 5
+            "insertedId": 3
           }
         },
         {
-          "name": "commitTransaction",
+          "name": "abortTransaction",
           "arguments": {
             "session": "session0"
+          }
+        },
+        {
+          "name": "insertMany",
+          "arguments": {
+            "documents": [
+              {
+                "_id": 4
+              },
+              {
+                "_id": 5
+              }
+            ],
+            "session": "session0"
+          },
+          "result": {
+            "insertedIds": {
+              "0": 4,
+              "1": 5
+            }
           }
         }
       ],
@@ -115,60 +118,12 @@
         {
           "command_started_event": {
             "command": {
-              "insert": "test",
-              "documents": [
-                {
-                  "_id": 2
-                },
-                {
-                  "_id": 3
-                }
-              ],
-              "ordered": true,
-              "lsid": "session0",
-              "txnNumber": {
-                "$numberLong": "1"
-              },
-              "stmtId": 1,
-              "startTransaction": null,
-              "autocommit": false,
-              "writeConcern": null
-            },
-            "command_name": "insert",
-            "database_name": "transaction-tests"
-          }
-        },
-        {
-          "command_started_event": {
-            "command": {
-              "insert": "test",
-              "documents": [
-                {
-                  "_id": 4
-                }
-              ],
-              "ordered": true,
-              "lsid": "session0",
-              "txnNumber": {
-                "$numberLong": "1"
-              },
-              "stmtId": 3,
-              "autocommit": false,
-              "writeConcern": null
-            },
-            "command_name": "insert",
-            "database_name": "transaction-tests"
-          }
-        },
-        {
-          "command_started_event": {
-            "command": {
               "commitTransaction": 1,
               "lsid": "session0",
               "txnNumber": {
                 "$numberLong": "1"
               },
-              "stmtId": 4,
+              "stmtId": 1,
               "startTransaction": null,
               "autocommit": false,
               "writeConcern": null
@@ -183,7 +138,31 @@
               "insert": "test",
               "documents": [
                 {
-                  "_id": 5
+                  "_id": 2
+                }
+              ],
+              "ordered": true,
+              "readConcern": null,
+              "lsid": "session0",
+              "txnNumber": {
+                "$numberLong": "2"
+              },
+              "stmtId": null,
+              "startTransaction": null,
+              "autocommit": null,
+              "writeConcern": null
+            },
+            "command_name": "insert",
+            "database_name": "transaction-tests"
+          }
+        },
+        {
+          "command_started_event": {
+            "command": {
+              "insert": "test",
+              "documents": [
+                {
+                  "_id": 3
                 }
               ],
               "ordered": true,
@@ -193,7 +172,7 @@
               },
               "lsid": "session0",
               "txnNumber": {
-                "$numberLong": "2"
+                "$numberLong": "3"
               },
               "stmtId": 0,
               "startTransaction": true,
@@ -207,18 +186,45 @@
         {
           "command_started_event": {
             "command": {
-              "commitTransaction": 1,
+              "abortTransaction": 1,
               "lsid": "session0",
               "txnNumber": {
-                "$numberLong": "2"
+                "$numberLong": "3"
               },
               "stmtId": 1,
               "startTransaction": null,
               "autocommit": false,
               "writeConcern": null
             },
-            "command_name": "commitTransaction",
+            "command_name": "abortTransaction",
             "database_name": "admin"
+          }
+        },
+        {
+          "command_started_event": {
+            "command": {
+              "insert": "test",
+              "documents": [
+                {
+                  "_id": 4
+                },
+                {
+                  "_id": 5
+                }
+              ],
+              "ordered": true,
+              "readConcern": null,
+              "lsid": "session0",
+              "txnNumber": {
+                "$numberLong": "4"
+              },
+              "stmtId": null,
+              "startTransaction": null,
+              "autocommit": null,
+              "writeConcern": null
+            },
+            "command_name": "insert",
+            "database_name": "transaction-tests"
           }
         }
       ],
@@ -230,9 +236,6 @@
             },
             {
               "_id": 2
-            },
-            {
-              "_id": 3
             },
             {
               "_id": 4

@@ -43,11 +43,15 @@
                 }
               ],
               "ordered": true,
+              "readConcern": {
+                "level": "snapshot"
+              },
               "lsid": "session0",
               "txnNumber": {
                 "$numberLong": "1"
               },
               "stmtId": 0,
+              "startTransaction": true,
               "autocommit": false,
               "writeConcern": null
             },
@@ -64,6 +68,8 @@
                 "$numberLong": "1"
               },
               "stmtId": 1,
+              "startTransaction": null,
+              "autocommit": false,
               "writeConcern": {
                 "w": "majority"
               }
@@ -122,11 +128,15 @@
                 }
               ],
               "ordered": true,
+              "readConcern": {
+                "level": "snapshot"
+              },
               "lsid": "session0",
               "txnNumber": {
                 "$numberLong": "1"
               },
               "stmtId": 0,
+              "startTransaction": true,
               "autocommit": false,
               "writeConcern": null
             },
@@ -143,6 +153,8 @@
                 "$numberLong": "1"
               },
               "stmtId": 1,
+              "startTransaction": null,
+              "autocommit": false,
               "writeConcern": null
             },
             "command_name": "commitTransaction",
@@ -202,11 +214,15 @@
                 }
               ],
               "ordered": true,
+              "readConcern": {
+                "level": "snapshot"
+              },
               "lsid": "session0",
               "txnNumber": {
                 "$numberLong": "1"
               },
               "stmtId": 0,
+              "startTransaction": true,
               "autocommit": false,
               "writeConcern": null
             },
@@ -223,6 +239,8 @@
                 "$numberLong": "1"
               },
               "stmtId": 1,
+              "startTransaction": null,
+              "autocommit": false,
               "writeConcern": {
                 "w": "majority"
               }
@@ -277,11 +295,15 @@
                 }
               ],
               "ordered": true,
+              "readConcern": {
+                "level": "snapshot"
+              },
               "lsid": "session0",
               "txnNumber": {
                 "$numberLong": "1"
               },
               "stmtId": 0,
+              "startTransaction": true,
               "autocommit": false,
               "writeConcern": null
             },
@@ -298,6 +320,8 @@
                 "$numberLong": "1"
               },
               "stmtId": 1,
+              "startTransaction": null,
+              "autocommit": false,
               "writeConcern": null
             },
             "command_name": "abortTransaction",

@@ -30,8 +30,10 @@ Each YAML file has the following keys:
 
   - ``description``: The name of the test.
 
-  - ``transactionOptions``: Optional, parameters to pass to
-    ClientSession.startTransaction().
+  - ``clientOptions``: Optional, parameters to pass to MongoClient().
+
+  - ``sessionOptions``: Optional, parameters to pass to
+    MongoClient.startSession().
 
   - ``operations``: Array of documents, each describing an operation to be
     executed. Each document has the following fields:
@@ -42,7 +44,8 @@ Each YAML file has the following keys:
 
       - ``result``: The return value from the operation, if any. If the
         operation is expected to return an error, the ``result`` has one field,
-        ``errorContains``, which is a substring of the expected error message.
+        ``errorContains``, which is a substring of the expected error message
+        or ``errorCodeName``, which is the expected server error "codeName".
 
   - ``expectations``: Optional list of command-started events.
 
@@ -74,9 +77,9 @@ For each YAML file, for each element in ``tests``:
 #. Create a MongoClient ``client``, with Command Monitoring listeners enabled.
    (Using a new MongoClient for each test ensures a fresh session pool that
    hasn't executed any transactions previously, so the tests can assert actual
-   txnNumbers, starting from 1.)
+   txnNumbers, starting from 1.) Pass this test's ``clientOptions`` if present.
 #. Call ``client.startSession`` twice to create ClientSession objects
-   ``session0`` and ``session1``, using the test's "transactionOptions" if they
+   ``session0`` and ``session1``, using the test's "sessionOptions" if they
    are present. Save their lsids so they are available after calling
    ``endSession``, see `Logical Session Id`.
 #. For each element in ``operations``:
@@ -92,14 +95,17 @@ For each YAML file, for each element in ``tests``:
      If ``arguments`` contains no "session", pass no explicit session to the
      method. If ``arguments`` includes "readPreference", configure the specified
      read preference in whatever manner the driver supports.
+   - If the driver throws an exception / returns an error while executing this
+     series of operations, store the error message and server error code.
    - If the result document has an "errorContains" field, verify that the
      method threw an exception or returned an error, and that the value of the
-     "errorContains" field matches the error string. Otherwise, compare the
-     method's return value to ``result`` using the same logic as the CRUD Spec
-     Tests runner. key is a substring (case-insensitive) of the actual error
-     message. If the
-   - If the driver throws an exception / returns an error while executing this
-     series of operations, store the error message.
+     "errorContains" field matches the error string. If the result document has
+     an "errorCodeName" field, verify that the method threw a command failed
+     exception or returned an error, and that the value of the "errorCodeName"
+     field matches the "codeName" in the server error response.
+     Otherwise, compare the method's return value to ``result`` using the same
+     logic as the CRUD Spec Tests runner. key is a substring (case-insensitive)
+     of the actual error message.
 
 #. Call ``session0.endSession()`` and ``session1.endSession``.
 #. If the test includes a list of command-started events in ``expectations``,
@@ -112,9 +118,9 @@ For each YAML file, for each element in ``tests``:
      exactly the documents in the ``data`` array.
 
 TODO:
+
 - drivers MUST NOT retry writes in a transaction even when retryWrites=true, needs to use failpoint.
 - drivers MUST retry commit/abort, needs to use failpoint.
-- test findAndModify once SERVER-33559 is done
 - test that stmtId is incremented after any failed write or read
 - ensure first test operation is causally consistent with create-collection command
 - ensure first test operation is causally consistent with the initial data insertion
@@ -123,9 +129,6 @@ TODO:
 - test writeConcernErrors
 - test readConcern everywhere
 - test retryable writes in transaction
-- test interaction of transactions and causal consistency
-- prose or YAML test of secondary snapshot reads, test all commands go to same
-  secondary, including commit/abortTransaction commands
 
 Command-Started Events
 ``````````````````````
@@ -154,3 +157,9 @@ that MUST be ignored. (In the Command Monitoring Spec tests, fake cursorIds are
 correlated with real ones, but that is not necessary for Transactions Spec
 tests.)
 
+afterClusterTime
+^^^^^^^^^^^^^^^^
+
+A ``readConcern.afterClusterTime`` value of ``42`` in a command-started event
+is a fake cluster time. Drivers MUST assert that the actual command includes an
+afterClusterTime.
