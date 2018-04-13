@@ -246,6 +246,7 @@ tests:
             readConcern:
               level: "snapshot"
               afterClusterTime: 42
+            lsid: session0
             txnNumber:
               $numberLong: "2"
             stmtId: 0
@@ -297,8 +298,6 @@ tests:
       - name: commitTransaction
         arguments:
           session: session0
-        result:
-          errorContains: no transaction started
 
     expectations:
       - command_started_event:
